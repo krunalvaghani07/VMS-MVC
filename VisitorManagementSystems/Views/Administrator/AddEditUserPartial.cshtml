@@ -1,0 +1,72 @@
+﻿@model VisitorManagementSystems.Models.User
+
+<div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+        <div class="modal-header">
+
+            @if (Model.Id == 0)
+            {
+                <h4 class="modal-title">
+                    &nbsp;&nbsp;&nbsp;Add User
+                </h4>
+            }
+            else
+            {
+                <h4 class="modal-title">
+                    &nbsp;&nbsp;&nbsp;Edit User
+                </h4>
+            }
+
+        </div>
+        <form method="post"
+              asp-action="AddEditUser" asp-controller="Administrator"
+              data-ajax="true" data-ajax-method="POST"
+              data-ajax-begin="OnBegin" data-ajax-failure="OnFailure"
+              data-ajax-success="OnSuccess" data-ajax-complete="OnComplete"
+              class="needs-validation" novalidate>
+            <div class="modal-body">
+                <div class="row form-group">
+                    <div class="col-4">
+                        Name
+                    </div>
+                    <div class="col-8">
+                        @Html.EditorFor(model => model.Name, new { htmlAttributes = new { @class = "form-control" } })
+                    </div>
+                </div>
+                <div class="row form-group">
+                    <div class="col-4">
+                        User_Name
+                    </div>
+                    <div class="col-8">
+                        @Html.HiddenFor(model => model.Id)
+                        @Html.HiddenFor(model => model.UserRoleId)
+                        @Html.EditorFor(model => model.USER_NAME, new { htmlAttributes = new { @class = "form-control", required = "required" } })
+                    </div>
+                </div>
+                <div class="row form-group">
+                    <div class="col-4">
+                        Password
+                    </div>
+                    <div class="col-8">
+                        @Html.EditorFor(model => model.PASSWORD, new { htmlAttributes = new { @class = "form-control", required = "required" } })
+                    </div>
+                </div>
+                <div class="row form-group">
+                    <div class="col-4">
+                        Role
+                    </div>
+                    <div class="col-8">
+                        @Html.DropDownListFor(model => model.Role_Id, ViewData["Roles"] as SelectList, new { @class = "form-control", @style = "width: 100%" })
+                    </div>
+                </div>
+                <div>
+                    <label id="errormessage" class="text-danger"></label>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-primary" data-save="modal">Save</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>

@@ -1,0 +1,380 @@
+﻿@{
+    ViewData["Title"] = "Manager";
+}
+@model List<VisitorManagementSystems.Models.Visitor>
+
+@section Scripts
+{
+    <script>
+        function OnBegin() {
+            $("#errormessage").text("");
+        }
+
+        function OnFailure(response) {
+
+        }
+
+        function OnSuccess(response) {
+            if (response.status == "success") {
+                $("#registerVisitor").modal('hide')
+                location.reload();
+            }
+        }
+        function OnComplete() {
+        }
+        function GetRandomColor() {
+            var trans = '0.3';
+            var color = 'rgba(';
+            for (var i = 0; i < 3; i++) {
+                color += Math.floor(Math.random() * 255) + ',';
+            }
+            color += trans + ')';
+            return color;
+        }
+        $(document).ready(function () {
+            var month = ["","January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+            const d = new Date();
+            month = month.slice(0, d.getMonth() + 2);
+
+            datasets = [];
+            @{
+                foreach(var dt in Model.Select(v => v.Department).Distinct().ToList())
+                {
+                    <text>
+                         var visitors = [];
+                    </text>
+
+                    for(int i = 0; i <= DateTime.Now.Month; i++)
+                    {
+                        int visitorcount = Model.Where(v => v.Entry_Time.Date.Month == i && v.Department.Equals(dt)).ToList().Count();
+                      <text>
+                        visitors.push(@visitorcount);
+                      </text>
+                    }
+                     <text>
+                        datasets.push({
+                            label: "@dt",
+                            backgroundColor: GetRandomColor(),
+                            data: visitors,
+                            fill: false
+                        });
+                     </text>
+                }
+            }
+            var data = {
+                "datasets": datasets,
+                "labels": month
+            };
+            console.log(datasets);
+            var options = {
+                "elements": {
+                    "rectangle": {
+                        "borderWidth": 2
+                    }
+                },
+                "layout": {
+                    "padding": 0
+                },
+                "legend": {
+                    "display": true,
+                    "labels": {
+                        "boxWidth": 16
+                    }
+                },
+                "maintainAspectRatio": false,
+                "responsive": true,
+                "title": {
+                    "display": true,
+                    "text": "Visitors",
+                    "align": 'center',
+                },
+                "plugins": {
+                    "title": {
+                        "display": true,
+                        "text": 'Visitors'
+                    }
+                },
+                "tooltips": {
+                    "intersect": false,
+                    "mode": "index",
+                    "position": "nearest",
+                    "callbacks": {}
+                }
+            }
+            var type = "line";
+
+            var myChart = new Chart(document.getElementById("myChart").getContext('2d'), { options, data, type });
+            var myChart2 = new Chart(document.getElementById("myChart2").getContext('2d'), {
+                options: {
+                    ...options,
+                    scales: {
+                        ...options.scales,
+                        yAxes: [
+                            {
+                                "scaleLabel": {
+                                    "display": true,
+                                    "labelString": "Visitors"
+                                },
+                                "id": "left",
+                                "stacked": false,
+                                "ticks": {
+                                    "beginAtZero": true,
+                                    suggestedMin: 0,
+                                    suggestedMax: 200
+                                }
+                            },
+                            {
+                                "scaleLabel": {
+                                    "display": true,
+                                    "labelString": "Date"
+                                },
+                                "id": "right",
+                                "position": "right",
+                                "stacked": false,
+                                "ticks": {
+                                    "beginAtZero": true,
+                                    suggestedMin: 0,
+                                    suggestedMax: 2000
+                                }
+                            }
+                        ]
+                    }
+                },
+                data,
+                type
+            });
+        });
+
+    </script>
+}
+<div class="container-fluid">
+    <button class="btn btn-sm btn-primary mb-2" data-toggle="modal" data-target="#registerVisitor">Register Visitor</button>
+    <div class="row">
+        <div class="col-lg-6 col-md-12 sm-12">
+
+            <div class="card" style="width: 100%;">
+                <div class="card-header" style="background-color:white;">
+                    <div>
+                        <h4>Today's Visitors</h4>
+                        @DateTime.Now.ToString("dddd, dd MMMM yyyy h:mm tt")
+                        <br />
+                        <h1>@Model.Where(v => v.Entry_Time.Date == DateTime.Today).ToList().Count()</h1>
+                    </div>
+                    <div class="row" style="margin-left: -1.25rem;">
+                        <ul class="nav nav-tabs card-header-tabs d-flex" style="margin-left: 0rem; margin-right:0rem; width:100%;">
+                            <li class="nav-item" style="width:25%; text-align:center;">
+                                <a class="nav-link active" data-toggle="tab" href="#today">TODAY</a>
+                            </li>
+                            <li class="nav-item" style="width: 25%; text-align: center;">
+                                <a class="nav-link" data-toggle="tab" href="#week">WEEK</a>
+                            </li>
+                            <li class="nav-item" style="width: 25%; text-align: center;">
+                                <a class="nav-link" data-toggle="tab" href="#month">MONTH</a>
+                            </li>
+                            <li class="nav-item" style="width: 25%; text-align: center;">
+                                <a class="nav-link" data-toggle="tab" href="#year">YEAR</a>
+                            </li>
+                        </ul>
+                    </div>
+                    <br />
+                </div>
+                <div class="tab-content card-body">
+                    <b class="float-left">Recent Visitor</b>
+                    <b class="float-right"><a asp-controller="Manager" asp-action="ViewAllVisitors">View ALL</a></b>
+                    </br>
+                    <div id="today" class="tab-pane overflow-auto active">
+                        <table class="table table-borderless dt-responsive mb-2" style="width:100%;">
+                            <tbody style="height:100px;overflow-y:auto">
+                                @{
+                                    var today = Model.Where(vs => vs.Entry_Time.Date == DateTime.Today).OrderByDescending(v => v.Entry_Time).ToList();
+                                    @for (int i = 0; i < 5; i++)
+                                    {
+                                        if (today.Count > i)
+                                        {
+                                            <tr>
+                                                <td style="width:60%">
+                                                    @today[i].Name
+                                                </td>
+                                                <td class="float-right">
+                                                    @today[i].Entry_Time.ToString("hh:mm tt")
+                                                </td>
+                                                <td class="float-right">
+                                                    @today[i].Department
+                                                </td>
+                                            </tr>
+                                        }
+                                        else
+                                        {
+                                            <tr>
+                                                <td style="width:60%">
+                                                </td>
+                                                <td class="float-right">
+                                                </td>
+                                                <td class="float-right">
+                                                </td>
+                                            </tr>
+
+                                        }
+
+                                    }
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                    <div id="week" class="tab-pane">
+                        <table class="table table-borderless dt-responsive mb-2" style="width:100%;">
+                            <tbody style="height:100px;overflow-y:auto">
+                                @{
+                                    var weekly = Model.Where(vs => (DateTime.Today - vs.Entry_Time.Date).TotalDays <= 7).OrderByDescending(v => v.Entry_Time).ToList();
+                                    @for (int i = 0; i < 5; i++)
+                                    {
+                                        if (weekly.Count > i)
+                                        {
+                                            //Random rnd = new Random();
+                                            //int k = rnd.Next(0, weekly.Count);
+                                            <tr>
+                                                <td style="width:60%">
+                                                    @weekly[i].Name
+                                                </td>
+                                                <td class="float-right">
+                                                    @weekly[i].Entry_Time.ToString("hh:mm tt")
+                                                </td>
+                                                <td class="float-right">
+                                                    @weekly[i].Department
+                                                </td>
+                                            </tr>
+                                        }
+                                        else
+                                        {
+                                            <tr>
+                                                <td style="width:60%">
+                                                </td>
+                                                <td class="float-right">
+                                                </td>
+                                                <td class="float-right">
+                                                </td>
+                                            </tr>
+
+                                        }
+
+                                    }
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                    <div id="month" class="tab-pane">
+                        <table class="table table-borderless dt-responsive mb-2" style="width:100%;">
+                            <tbody style="height:100px;overflow-y:auto">
+                                @{
+                                    var monthly = Model.Where(vs => (DateTime.Today - vs.Entry_Time.Date).TotalDays <= 30).OrderByDescending(v => v.Entry_Time).ToList();
+                                    @for (int i = 0; i < 5; i++)
+                                    {
+                                        @if (monthly.Count > i)
+                                        {
+                                            //Random rnd = new Random();
+                                            //int k = rnd.Next(0, monthly.Count);
+                                            <tr>
+                                                <td style="width:60%">
+                                                    @monthly[i].Name
+                                                </td>
+                                                <td class="float-right">
+                                                    @monthly[i].Entry_Time.ToString("hh:mm tt")
+                                                </td>
+                                                <td class="float-right">
+                                                    @monthly[i].Department
+                                                </td>
+                                            </tr>
+                                        }
+                                        else
+                                        {
+                                            <tr>
+                                                <td style="width:60%">
+                                                </td>
+                                                <td class="float-right">
+                                                </td>
+                                                <td class="float-right">
+                                                </td>
+                                            </tr>
+
+                                        }
+
+                                    }
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                    <div id="year" class="tab-pane">
+                        <table class="table table-borderless dt-responsive mb-2" style="width:100%;">
+                            <tbody style="height:100px;overflow-y:auto">
+                                @{
+                                    var yearly = Model.Where(vs => (DateTime.Today - vs.Entry_Time.Date).TotalDays <= 365).OrderByDescending(v => v.Entry_Time).ToList();
+                                    @for (int i = 0; i < 5; i++)
+                                    {
+                                        if (yearly.Count > i)
+                                        {
+                                            <tr>
+                                                <td style="width:60%">
+                                                    @yearly[i].Name
+                                                </td>
+                                                <td class="float-right">
+                                                    @yearly[i].Entry_Time.ToString("h:mm tt")
+                                                </td>
+                                                <td class="float-right">
+                                                    @yearly[i].Department
+                                                </td>
+                                            </tr>
+                                        }
+                                        else
+                                        {
+                                            <tr>
+                                                <td style="width:60%">
+                                                </td>
+                                                <td class="float-right">
+                                                </td>
+                                                <td class="float-right">
+                                                </td>
+                                            </tr>
+
+                                        }
+
+                                    }
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6 col-md-12 sm-12">
+            <div class="card" style="width: 100%;">
+                <canvas style="height:400px;" id="myChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" tabindex="-1" id="registerVisitor" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post" enctype="multipart/form-data"
+                  asp-action="RegisterVisitor" asp-controller="Manager"
+                  data-ajax="true" data-ajax-method="POST"
+                  data-ajax-begin="OnBegin" data-ajax-failure="OnFailure"
+                  data-ajax-success="OnSuccess" data-ajax-complete="OnComplete"
+                  class="needs-validation">
+                <div class="modal-body">
+                    <div class="row form-group">
+                        <input type="file" style="margin: auto; display: block; " id="dataFile" name="registerVisitor" />
+                    </div>
+                    <div>
+                        <label id="errormessage" class="text-danger"></label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary" data-save="modal">Save</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

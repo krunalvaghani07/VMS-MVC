@@ -1,0 +1,103 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - VisitorManagementSystems</title>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" />
+    <link rel="stylesheet" href="~/css/sidebar.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.12.1/css/jquery.dataTables.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="d-flex" id="wrapper">
+        <!-- Sidebar-->
+        <header>
+            <div class="border-end bg-white" id="sidebar-wrapper">
+                <div class="list-group list-group-flush">
+                    <ul class="navbar-nav nav flex-grow-1" id="menuItem" style="width: inherit;">
+                        <li class="nav-item" style="text-align: center;">
+                            <div class="card border-0">
+                                <div class="card-body">
+                                    <img src="~/images/banas-dairy-logo 1.png" alt="VMS">
+
+                                </div>
+                            </div>
+                        </li>
+                        @if (User.Identity.IsAuthenticated)
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">
+                                    &nbsp;&nbsp;&nbsp; <img src="~/images/Vectorunfilled.svg">&nbsp;&nbsp;&nbsp;
+                                    Home
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">
+                                    &nbsp;&nbsp;&nbsp; <img src="~/images/Vectorunfilled.svg">&nbsp;&nbsp;&nbsp;
+                                    Privacy
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        </header>
+        
+        <!-- Page content wrapper-->
+        <div id="page-content-wrapper">
+            <!-- Top navigation-->
+            <nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom header-image">
+                <div class="container-fluid">
+                    <button type="button" class="navbar-toggle" data-toggle="collapse" id="sidebarToggle">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    @if (User.Identity.IsAuthenticated)
+                    {
+                        <div id="navbarSupportedContent" class="p-relative">
+                            <div class="row">
+                                <div class="col-8 pr-0">
+                                    <b class="float-right">
+                                        @User.Identity.Name
+                                    </b> <br />
+                                    <p class="float-right">
+                                        @User.Identity.GetUserRole()
+                                    </p>
+                                </div>
+                                <div class="col-3 pl-1">
+                                    <a data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="true">
+                                        <i><img src="~/images/user.png" /></i>
+                                    </a>
+                                    <ul id="loginSidebar" class="dropdown-menu">
+                                        <li><a class="nav-link text-dark" asp-area="" asp-controller="Auth" asp-action="Logout">Logout</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </nav>
+            <!-- Page content-->
+            <div class="container-fluid">
+                <main role="main" class="main my-5" id="mainPageRender">
+                    <div class="row">
+                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                            @RenderBody()
+                        </div>
+                    </div>
+                </main>
+
+            </div>
+        </div>
+    </div>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script type="text/javascript" src="~/js/jquery.dataTables.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script type="text/javascript" src="~/lib/jquery-validation-unobtrusive/jquery-ajax-unobtrusive.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @RenderSection("Scripts", required: false)
+</body>
+</html>

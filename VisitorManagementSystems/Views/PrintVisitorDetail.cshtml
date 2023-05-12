@@ -1,0 +1,95 @@
+﻿@model VisitorManagementSystems.Models.Visitor
+@section Scripts
+{
+<style>
+    table.table-bordered {
+        border: 1px solid black;
+        margin-top: 20px;
+    }
+
+        table.table-bordered > thead > tr > th {
+            border: 1px solid black;
+        }
+
+        table.table-bordered > tbody > tr > td {
+            border: 1px solid black;
+        }
+</style>
+    <script>
+        $(document).ready(function () {
+            $('header').empty();
+            $('.navbar').hide();
+            //window.print();
+        });
+    </script>
+}
+<div>
+    <table class="table table-bordered" width="100%" cellspacing="0">
+        <tr>
+            <td>
+                <img id="previewImg" src="~/images/@Model.Photo" style="display: block; margin-left: auto; margin-right: auto;" />
+            </td>
+        </tr>
+    </table>
+    <table class="table table-bordered" width="100%" cellspacing="0">
+        <tr>
+            <td>
+                <table class="table table-bordered">
+                    <tr>
+                        <td>Visitor Name</td>
+                        <td>@Model.Name</td>
+                    </tr>
+                    <tr>
+                        <td>Entry Time</td>
+                        <td>@Model.Entry_Time.ToString("dddd, dd MMMM yyyy h:mm tt")</td>
+                    </tr>
+                    <tr>
+                        <td>Exit Time</td>
+                        @if (Model.Exit_Time == null)
+                        {
+                            <td></td>
+
+                        }
+                        else
+                        {
+                            <td>@Model.Exit_Time?.ToString("dddd, dd MMMM yyyy h:mm tt")</td>
+                        }
+                    </tr>
+                    <tr>
+                        <td colspan="2">Address : @Model.Address</td>
+                    </tr>
+                    <tr>
+                        <td colspan="2">Purpose : @Model.Purpose</td>
+                    </tr>
+                    <tr>
+                        <td colspan="2">Carried Asset : @Model.Carried_Assets</td>
+                    </tr>
+                </table>
+            </td>
+            <td>
+                <table class="table table-bordered">
+                    <tr>
+                        <td>Department</td>
+                        <td>@Model.Department</td>
+                    </tr>
+                    <tr>
+                        <td>Person To Meet</td>
+                        <td>@Model.Person_to_Meet</td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</div>
+<br/>
+<br />
+<div style="float:right;">
+    <table class="table table-borderless">
+        <thead>
+            <tr>
+                <th>Signature</th>
+                <th>&nbsp;&nbsp;&nbsp;</th>
+            </tr>
+        </thead>
+    </table>
+</div>

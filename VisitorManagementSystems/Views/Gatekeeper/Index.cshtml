@@ -1,0 +1,139 @@
+﻿@{
+    ViewData["Title"] = "Gatekeeper";
+}
+@model List<VisitorManagementSystems.Models.Visitor>
+@section Scripts
+{
+    <style type="text/css">
+        .card-text {
+            font-size: small;
+        }
+        .table td, .table th {
+             padding: 0rem; 
+        }
+    </style>
+    <script>
+        function OnBegin() {
+            $("#errormessage").text("");
+        }
+
+        function OnFailure(response) {
+
+        }
+
+        function OnSuccess(response) {
+            if (response.status == "success") {
+                if (response.action == "redirect") {
+                    location.href = response.location;
+                }
+            }
+        }
+        function OnComplete() {
+        }
+
+        function Edit(id) {
+            location.href = "/Gatekeeper/AddEditVisitor?id=" + id;
+        }
+        function Print(id) {
+            location.href = "/Gatekeeper/PrintVisitorDetail?id=" + id;
+        }
+        function ExitVisitor(id) {
+            $.ajax({
+                type: "POST",
+                "url": "/Gatekeeper/ExitVisitor?" + $.param({ id: id }),
+                success: function (response) {
+                    location.reload();
+                },
+                error: function (xhr, status, error) {
+                }
+            });
+        }
+        function Delete(id) {
+            $('#confirm').modal({
+                backdrop: 'static',
+                keyboard: false
+            }).on('click', '#delete', function (e) {
+                $.ajax({
+                    type: "DELETE",
+                    "url": "/Gatekeeper/DeleteVisitor?" + $.param({ id: id }),
+                    success: function (response) {
+                        $('#confirm').modal('hide');
+                    },
+                    error: function (xhr, status, error) {
+                    }
+                });
+                table.ajax.reload(null, false);
+            });
+            $("#cancel").on('click', function (e) {
+                e.preventDefault();
+                $('#confirm').modal('hide');
+            });
+        }
+    </script>
+}
+<div id="confirm" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-body">
+                Are you sure?
+            </div>
+            <div class="modal-footer">
+                <button type="button" data-dismiss="modal" class="btn btn-primary" id="delete">Delete</button>
+                <button type="button" data-dismiss="modal" class="btn">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+</div>
+<div class="container-fluid">
+     <a type="button" class="btn btn-success mb-2"  asp-controller="Gatekeeper" asp-action="AddEditVisitor">Add New Visitor</a>
+    <div class="row">
+        @for (int i = 0; i < Model.Count; i++)
+        {
+            <div class="col-lg-4 col-md-6 col-sm-12" style="padding-bottom: 30px;">
+                <div class="card h-100">
+
+                    <div class="card-body">
+                        <div>
+                            <h4 style="width:100%;">
+                                @Model[i].Name
+                                <button title="Edit" class="btn btn-link" style="float:right;" onclick="Edit(@Model[i].Id)"><span class="fa fa-edit fa-lg"></span></button>
+                                <button title="Print" class="btn btn-link" style="float:right;" onclick="Print(@Model[i].Id)"><span class="fa fa-print fa-lg"></span></button>
+                            </h4>
+                            <p class="card-text">To Meet @Model[i].Person_to_Meet</p>
+                        </div>
+                        <hr />
+                        <div>
+                            <table class="table table-borderless dt-responsive mb-2" style="width:100%;">
+                                <tbody>
+                                    <tr class="card-text">
+                                        <td style="width:60%;">For @Model[i].Purpose</td>
+                                        <td>Entry @Model[i].Entry_Time.ToString("h:mm tt") </td>
+                                    </tr>
+
+                                    @if (Model[i].Exit_Time == null)
+                                    {
+                                        <tr class="card-text">
+                                            <td style="width:60%;">In @Model[i].Department</td>
+                                            <td><button class="btn btn-sm btn-primary" onclick="ExitVisitor(@Model[i].Id)">Exit Now</button></td>
+                                        </tr>
+                                    }
+                                    else
+                                    {
+                                        <tr class="card-text">
+                                            <td style="width:60%;">In @Model[i].Department</td>
+                                            <td>Exit @Model[i].Exit_Time?.ToString("h:mm tt") </td>
+                                        </tr>
+                                    }
+                                    <tr class="card-text">
+                                        <td>@Model[i].Phone</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>

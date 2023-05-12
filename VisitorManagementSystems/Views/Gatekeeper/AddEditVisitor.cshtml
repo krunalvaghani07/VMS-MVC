@@ -1,0 +1,192 @@
+﻿@model VisitorManagementSystems.Models.Visitor
+@section Scripts
+{
+    <script>
+
+        $('.datetimepicker').datetimepicker();
+
+        function OnBegin() {
+            $("#errormessage").text("");
+        }
+
+        function OnFailure(response) {
+
+        }
+
+        function OnSuccess(response) {
+            alert("Visitor Saved");
+            
+            if (response.status == "success") {
+                if (response.action == "redirect") {
+                    location.href = response.location;
+                }
+            }
+            else {
+                $("#previewImg").attr("src", "/images/defaultimage.png");
+                $("#visitorForm")[0].reset()
+            }
+        }
+        function OnComplete() {
+        }
+        function OpenCamera(){
+            $("#capturedimage").trigger('click');
+        }
+        function UploadImage() {
+            $("#uploadimage").trigger('click');
+        }
+        function fileCaptureChange() {
+            var file = $("#capturedimage").get(0).files[0];
+            if (file) {
+                var reader = new FileReader();
+
+                reader.onload = function () {
+                    $("#previewImg").attr("src", reader.result);
+                }
+
+                reader.readAsDataURL(file);
+            }
+        }
+        function fileUploadChange() {
+            var file = $("#uploadimage").get(0).files[0];
+            if (file) {
+                var reader = new FileReader();
+
+                reader.onload = function () {
+                    $("#previewImg").attr("src", reader.result);
+                }
+
+                reader.readAsDataURL(file);
+            }
+        }
+    </script>
+}
+<div>
+    <div>
+        <div>
+
+            @if (Model.Id == 0)
+            {
+                <h4 class="modal-title text-center">
+                    &nbsp;&nbsp;&nbsp;Add New Visitor
+                </h4>
+            }
+            else
+            {
+                <h4 class="modal-title text-center">
+                    &nbsp;&nbsp;&nbsp;Edit Visitor
+                </h4>
+            }
+
+        </div>
+        <form id="visitorForm" method="post" enctype="multipart/form-data"
+              asp-action="SaveVisitor" asp-controller="Gatekeeper"
+              data-ajax="true" data-ajax-method="POST"
+              data-ajax-begin="OnBegin" data-ajax-failure="OnFailure"
+              data-ajax-success="OnSuccess" data-ajax-complete="OnComplete"
+              class="needs-validation" novalidate>
+            <div class="container">
+                @Html.HiddenFor(model => model.Id)
+                @Html.HiddenFor(model => model.Photo)
+                <div class="row mb-2">
+                    <div class="col-sm-12 col-md-12 col-lg-12">
+                        <div class="card">
+                            <div class="card-body">
+                                @if (Model.Photo != null)
+                                {
+                                    <img id="previewImg" src="~/images/@Model.Photo" style="width: 150px; height: 150px; display: block; margin-left: auto; margin-right: auto;" />
+
+                                }
+                                else
+                                {
+                                    <img id="previewImg" src="~/images/defaultimage.png" style="width: 150px; height: 150px; display: block; margin-left: auto; margin-right: auto;" />
+                                }
+                                <input type="file" accept="image/*" name="capturedimage" onchange="fileCaptureChange()" id="capturedimage" style="display:none;" capture>
+                                <input type="file" accept="image/*" name="capturedimage" onchange="fileUploadChange()" id="uploadimage" style="display:none;">
+                            </div>
+                            <div class="card-footer">
+                                <button class="btn btn-secondary" id="captureimageicon" type="button" onclick="OpenCamera()"><span class="fa fa-camera fa-lg"></span></button>
+                                &nbsp;&nbsp;&nbsp;<button class="btn btn-primary" id="uploadimageicon" type="button" onclick="UploadImage()"><span class="fa fa-upload fa-lg"></span></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mb-2">
+                    <div class="col-sm-12 col-md-3 col-lg-3">
+                        Name
+                    </div>
+                    <div class="col-sm-12 col-md-3 col-lg-3">
+                        @Html.EditorFor(model => model.Name, new { htmlAttributes = new { @class = "form-control" } })
+                    </div>
+                    <div class="col-sm-12 col-md-3 col-lg-3">
+                        Phone
+                    </div>
+                    <div class="col-sm-12 col-md-3 col-lg-3">
+                        @Html.EditorFor(model => model.Phone, new { htmlAttributes = new { @type = "number", max = 9999999999, @class = "form-control", required = "required" } })
+                    </div>
+                </div>
+                <div class="row mb-2">
+                    <div class="col-sm-12 col-md-3 col-lg-3">
+                        Address
+                    </div>
+                    <div class="col-sm-12 col-md-9 col-lg-9">
+                        @Html.TextAreaFor(model => model.Address, new { style = "width:100%;" })
+                    </div>
+
+                </div>
+                @if (Model.Id != 0)
+                {<div class="row mb-2">
+                        <div class="col-sm-12 col-md-3 col-lg-3">
+                            Entry Time
+                        </div>
+                        <div class="col-sm-12 col-md-3 col-lg-3">
+                            @Html.EditorFor(model => model.Entry_Time, new { htmlAttributes = new { @class = "form-control datetimepicker", required = "required" } })
+                        </div>
+                        <div class="col-sm-12 col-md-3 col-lg-3">
+                            Exit Time
+                        </div>
+                        <div class="col-sm-12 col-md-3 col-lg-3">
+                            @Html.EditorFor(model => model.Exit_Time, new { htmlAttributes = new { @class = "form-control datetimepicker", required = "required" } })
+                        </div>
+                    </div>
+                }
+                <div class="row mb-2">
+                    <div class="col-sm-12 col-md-3 col-lg-3">
+                        Purpose
+                    </div>
+                    <div class="col-sm-12 col-md-3 col-lg-3">
+                        @Html.EditorFor(model => model.Purpose, new { htmlAttributes = new { @class = "form-control", required = "required" } })
+                    </div>
+                    <div class="col-sm-12 col-md-3 col-lg-3">
+                        Person to Meet
+                    </div>
+                    <div class="col-sm-12 col-md-3 col-lg-3">
+                        @Html.EditorFor(model => model.Person_to_Meet, new { htmlAttributes = new { @class = "form-control", required = "required" } })
+                    </div>
+                </div>
+                <div class="row mb-2">
+                    <div class="col-sm-12 col-md-3 col-lg-3">
+                        Department
+                    </div>
+                    <div class="col-sm-12 col-md-3 col-lg-3">
+                        @Html.EditorFor(model => model.Department, new { htmlAttributes = new { @class = "form-control", required = "required" } })
+                    </div>
+
+                    <div class="col-sm-12 col-md-3 col-lg-3">
+                        Carried Assets
+                    </div>
+                    <div class="col-sm-12 col-md-3 col-lg-3">
+                        @Html.EditorFor(model => model.Carried_Assets, new { htmlAttributes = new { @class = "form-control", required = "required" } })
+                    </div>
+                </div>
+                <div>
+                    <label id="errormessage" class="text-danger"></label>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-primary" data-save="modal">Save</button>
+                <a type="button" class="btn btn-secondary" id="cancel_btn" data-dismiss="modal" asp-action="Index" asp-controller="Gatekeeper">Cancel</a>
+            </div>
+
+        </form>
+    </div>
+</div>
